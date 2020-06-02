@@ -8,11 +8,24 @@ class FormularioNfe extends Component {
         this.state = {
             nfe: null
         }
+        this.handleChangeCest = this.handleChangeCest.bind(this);
     }
 
     handleChangeCest(event) {
-        console.log(event.target.querySelector('option[value="' + event.target.value + '"]').textContent.split('-')[1].replace(' ',''));
-        console.log(event.target.value);
+        //var pmvaSelect =event.target.querySelector('option[value="' + event.target.value + '"]').textContent.split('-')[1].replace(' ', '')
+        var cestSelect = event.target.value;
+        var itemSelect = event.target.querySelector('option[value="' + cestSelect + '"]').getAttribute('item');
+
+        const itens = this.state.nfe.itens.map((item, i) => {
+            if (itemSelect === i.toString()) {
+                item.cest = cestSelect;
+            }
+            return item;
+        });
+
+        console.log(itens);
+
+        this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
     }
 
     componentDidMount() {
@@ -31,9 +44,8 @@ class FormularioNfe extends Component {
                         <select value="0000000" onChange={this.handleChangeCest}>
                             <option value="0000000"> - </option>
                             {ncm_.cest.map((cest, index) =>
-                                <option key={cest.codigo} value={cest.codigo}>{cest.codigo} - {cest.pmva}</option>
+                                <option key={cest.codigo} item={key} value={cest.codigo}>{cest.codigo} - {cest.pmva}</option>
                             )}
-
                         </select>
                     </td></>)
                 }
@@ -44,7 +56,6 @@ class FormularioNfe extends Component {
     }
 
     handleClick(key, value) {
-        console.log("click " + key);
         const itens = this.state.nfe.itens.map((item, i) => {
             if (i === key) {
                 item.codigo = value
@@ -53,7 +64,6 @@ class FormularioNfe extends Component {
                 return item;
             }
         });
-        console.log(itens);
         this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
     }
 
