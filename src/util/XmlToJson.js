@@ -11,7 +11,6 @@ const XmlToJson = (arquivo) => {
         const det = Array.apply(null, infNFe.querySelectorAll('det'))
 
         const item = det.map((item) => {
-            var desconto = item.querySelector('prod vDesc') ? item.querySelector('prod vDesc').textContent : 0
             var produto = {
                 nome: item.querySelector('prod > xProd').textContent
                 , item: item.getAttribute('nItem')
@@ -22,7 +21,7 @@ const XmlToJson = (arquivo) => {
                 , un: item.querySelector('prod > uCom').textContent
                 , vunit: item.querySelector('prod > vUnCom').textContent * 1
                 , quant: item.querySelector('prod > qCom').textContent * 1
-                , vprod: (item.querySelector('prod > qCom').textContent * item.querySelector('prod vUnCom').textContent) - desconto
+                , vun: item.querySelector('prod > vUnCom').textContent * 1
                 , vseg: item.querySelector('prod > vSeg') ? item.querySelector('prod > vSeg').textContent * 1 : 0
                 , vfrete: item.querySelector('prod > vFrete') ? item.querySelector('prod > vFrete').textContent * 1 : 0
                 , voutro: item.querySelector('prod > vOutro') ? item.querySelector('prod > vOutro').textContent * 1 : 0

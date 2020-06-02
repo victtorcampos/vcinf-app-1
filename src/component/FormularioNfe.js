@@ -8,7 +8,19 @@ class FormularioNfe extends Component {
         this.state = {
             nfe: null
         }
+
         this.handleChangeCest = this.handleChangeCest.bind(this);
+        this.handlerSomaValorTotalItens = this.handlerSomaValorTotalItens.bind(this);
+    }
+
+    componentDidMount() {
+        this.props.nfe.itens.map((item, index) => {
+            if(item.cest === ''){
+                let ncm_ = EntityNcm.filter((ncm_) => ncm_.codigo.includes(item.ncm))[0];
+                console.log(ncm_);
+            }
+        });
+        this.setState({ nfe: this.props.nfe })
     }
 
     handleChangeCest(event) {
@@ -21,14 +33,11 @@ class FormularioNfe extends Component {
             }
             return item;
         });
-
-        console.log(itens);
-
         this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
     }
 
-    componentDidMount() {
-        this.setState({ nfe: this.props.nfe })
+    handlerSomaValorTotalItens() {
+        return (<b>{this.state.nfe.itens.reduce((acumulado, i) => acumulado + (i.vunit * i.quant), 0)}</b>);
     }
 
     checkCest(key, ncm, cest) {
@@ -68,7 +77,7 @@ class FormularioNfe extends Component {
 
     render() {
         if (this.state.nfe !== null) {
-            console.log(this.state.nfe);
+            //console.log(this.state.nfe);
             return (
 
                 <div className="container-fluid" >
@@ -179,22 +188,38 @@ class FormularioNfe extends Component {
                                         <th scope="col">Item</th>
                                         <th scope="col">Código</th>
                                         <th scope="col">Descrição</th>
+                                        <th scope="col">Qnt</th>
+                                        <th scope="col">Valor un</th>
+                                        <th scope="col">Desconto</th>
+                                        <th scope="col">Valor Total</th>
                                         <th scope="col">Código NCM</th>
                                         <th scope="col">Código CEST</th>
                                         <th scope="col">MVA%</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {this.state.nfe.itens.map((produto, index) =>
-                                        <tr key={produto.item}>
-                                            <td className="text-center">{produto.item}</td>
-                                            <td className="text-center">{produto.codigo}</td>
-                                            <td>{produto.nome.toUpperCase()}</td>
-                                            {/* <td className="text-center" onClick={() => this.handleClick(index,'9999')}>{produto.ncm}</td> */}
-                                            <td className="text-center">{produto.ncm}</td>
-                                            {this.checkCest(index, produto.ncm, produto.cest)}
-                                        </tr>
-                                    )}
+                                    {this.state.nfe.itens.map(
+                                        (produto, index) =>
+                                            <tr key={produto.item}>
+                                                <td className="text-center">{produto.item}</td>
+                                                <td className="text-center">{produto.codigo}</td>
+                                                <td>{produto.nome.toUpperCase()}</td>
+                                                <td>{produto.quant}</td>
+                                                <td>{produto.vun}</td>
+                                                <td>{produto.vdesc}</td>
+                                                <td>{((produto.vun * produto.quant) - produto.vdesc) * 1}</td>
+                                                {/* <td className="text-center" onClick={() => this.handleClick(index,'9999')}>{produto.ncm}</td> */}
+                                                <td className="text-center">{produto.ncm}</td>
+
+                                                {/* {this.checkCest(index, produto.ncm, produto.cest)} */}
+                                            </tr>
+                                    )
+                                    }
+                                    <tr>
+                                        <td colSpan={6}></td>
+                                        <td>{this.handlerSomaValorTotalItens()}</td>
+                                        <td colSpan={3}></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
