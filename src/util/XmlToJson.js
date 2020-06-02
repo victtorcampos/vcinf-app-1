@@ -29,7 +29,7 @@ const XmlToJson = (arquivo) => {
                 , picms: item.querySelector('imposto > ICMS pICMS') ? item.querySelector('imposto > ICMS pICMS').textContent * 1 : 0
                 , pipi: item.querySelector('imposto > IPI pIPI') ? item.querySelector('imposto > IPI pIPI').textContent * 1 : 0
                 , vdesc: item.querySelector('prod vDesc') ? item.querySelector('prod vDesc').textContent * 1 : 0
-                , pmvast: item.querySelector('imposto > ICMS pMVAST') ? item.querySelector('imposto > ICMS pMVAST').textContent * 1 : 0
+                , pmvast: item.querySelector('imposto > ICMS pMVAST') ? item.querySelector('imposto > ICMS pMVAST').textContent * 1 : null
             }
             return produto;
         })
