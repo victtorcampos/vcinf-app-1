@@ -12,7 +12,6 @@ class FormularioNfe extends Component {
     }
 
     handleChangeCest(event) {
-        //var pmvaSelect =event.target.querySelector('option[value="' + event.target.value + '"]').textContent.split('-')[1].replace(' ', '')
         var cestSelect = event.target.value;
         var itemSelect = event.target.querySelector('option[value="' + cestSelect + '"]').getAttribute('item');
 
