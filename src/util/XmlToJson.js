@@ -29,6 +29,8 @@ const XmlToJson = (arquivo) => {
                 , pipi: item.querySelector('imposto > IPI pIPI') ? item.querySelector('imposto > IPI pIPI').textContent * 1 : 0
                 , vdesc: item.querySelector('prod vDesc') ? item.querySelector('prod vDesc').textContent * 1 : 0
                 , pmvast: item.querySelector('imposto > ICMS pMVAST') ? item.querySelector('imposto > ICMS pMVAST').textContent * 1 : null
+                , vicmsst : item.querySelector('imposto > ICMS vICMSST') ? item.querySelector('imposto > ICMS vICMSST').textContent * 1 : 0
+                , vicms :item.querySelector('imposto > ICMS vICMS') ? item.querySelector('imposto > ICMS vICMS').textContent * 1 : 0
                 , vprod: item.querySelector('prod > vProd').textContent * 1
             }
             return produto;

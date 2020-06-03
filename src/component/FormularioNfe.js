@@ -11,8 +11,9 @@ class FormularioNfe extends Component {
 
         this.handleChangeCest = this.handleChangeCest.bind(this);
         this.handlerSomaValorTotalItens = this.handlerSomaValorTotalItens.bind(this);
+        this.handlerSomaValorIcmsStPago = this.handlerSomaValorIcmsStPago.bind(this);
         this.buscaCest = this.buscaCest.bind(this);
-        this.handlerChangeCest = this.handlerChangeCest.bind(this);
+        this.selectCest = this.selectCest.bind(this);
     }
 
     componentDidMount() {
@@ -54,24 +55,35 @@ class FormularioNfe extends Component {
     }
 
     handlerSomaValorTotalItens() {
-        return (<b>{this.state.nfe.itens.reduce((acumulado, i) => acumulado + (i.vunit * i.quant), 0)}</b>);
+        return (<b>{this.state.nfe.itens.reduce((a, i) => a + (i.vunit * i.quant), 0)}</b>);
     }
 
-    handlerChangeCest(event) {
-        event.preventDefault();
-        console.log( event.target.value);
+    handlerSomaValorIcmsStPago() {
+        return (<b>{this.state.nfe.itens.reduce((a, i) => a + i.vicmsst, 0)}</b>);
     }
 
     selectCest(props) {
         return (<>
             <td colSpan={2} className="text-center">
-                <select defaultValue={0} onChange={null} className="custom-select custom-select-sm">
-                    <option item={props.index} value="0">Celecionar Cest</option>
-                    <option item={props.index} value="1002000">Materiais de construção e congêneres</option>
-                    <option item={props.index} value="1301600">Medicamentos de uso humano e outros produtos farmacêuticos para uso humano ou veterinário​</option>
-                    <option item={props.index} value="1900600">Produtos eletrônicos, eletroeletrônicos e eletrodomésticos</option>
-                    <option item={props.index} value="2004000">Rações para animais domésticos</option>
-                    <option item={props.index} value="2803800">VENDAS PORTA A PORTA</option>
+
+                <select className="custom-select custom-select-sm" onChange={(e) => {
+                    this.state.nfe.itens.map((prod, i) => {
+                        if (i === props.index) {
+                            prod.cest = e.target.value
+                            return prod;
+                        } else {
+                            return prod;
+                        }
+
+                    });
+                    this.setState({ nfe: this.state.nfe })
+                }} defaultValue={0} >
+                    <option value="0">Celecionar Cest</option>
+                    <option item="6" value="1002000">Materiais de construção e congêneres</option>
+                    <option item="6" value="1301600">Medicamentos de uso humano e outros produtos farmacêuticos para uso humano ou veterinário​</option>
+                    <option item="6" value="1900600">Produtos eletrônicos, eletroeletrônicos e eletrodomésticos</option>
+                    <option item="6" value="2004000">Rações para animais domésticos</option>
+                    <option item="6" value="2803800">VENDAS PORTA A PORTA</option>
                 </select>
             </td>
         </>)
@@ -204,16 +216,19 @@ class FormularioNfe extends Component {
                                             <tr key={produto.item} className={produto.tribSt ? 'table-danger' : ''}>
                                                 <td className="text-center">{produto.item}</td>
                                                 <td className="text-center">{produto.codigo}</td>
-                                                <td>{produto.nome.toUpperCase()}</td>
-                                                <td>{produto.quant}</td>
-                                                <td>{produto.vunit}</td>
-                                                <td>{produto.vdesc}</td>
+                                                <td>{produto.nome.toUpperCase()}
+                                                    {produto.pipi > 0 ? <><br /><span>IPI : {(produto.vprod * produto.pipi) / 100}</span></> : ''}
+                                                    {produto.vicms > 0 ? <><br /><span>ICMS : {produto.vicms}</span></> : ''}
+                                                    {produto.vicmsst > 0 ? <><br /><span>ICMS ST : {produto.vicmsst}</span> </> : ''}
+                                                </td>
+                                                <td className="text-center" >{produto.quant}</td>
+                                                <td className="text-center">{produto.vunit}</td>
+                                                <td className="text-center">{produto.vdesc}</td>
                                                 <td className="text-center">{produto.vprod}</td>
                                                 <td className="text-center">{produto.ncm}</td>
                                                 {produto.cest === null ?
                                                     <this.selectCest ncm={produto.ncm} index={index} /> :
-                                                    <><td className="text-center">{produto.cest}</td>
-                                                        <td className="text-center">{produto.pmvast}</td></>
+                                                    <><td className="text-center">{produto.cest}</td> <td className="text-center">{produto.pmvast}</td></>
                                                 }
 
                                             </tr>
@@ -222,7 +237,8 @@ class FormularioNfe extends Component {
                                     <tr className="table-dark">
                                         <td colSpan={6}></td>
                                         <td className="text-center">{this.handlerSomaValorTotalItens()}</td>
-                                        <td colSpan={3}></td>
+                                        <td colSpan={5}></td>
+                                        {/* <td className="text-center">{this.handlerSomaValorIcmsStPago()}</td> */}
                                     </tr>
                                 </tbody>
                             </table>
