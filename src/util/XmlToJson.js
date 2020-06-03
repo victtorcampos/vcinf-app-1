@@ -13,15 +13,15 @@ const XmlToJson = (arquivo) => {
         const item = det.map((item) => {
             var produto = {
                 nome: item.querySelector('prod > xProd').textContent
+                , tribSt: false
                 , item: item.getAttribute('nItem')
                 , codigo: item.querySelector('prod > cProd').textContent
                 , ncm: item.querySelector('prod > NCM').textContent
-                , cest: item.querySelector('prod > CEST') ? item.querySelector('prod > CEST').textContent : ''
+                , cest: item.querySelector('prod > CEST') ? item.querySelector('prod > CEST').textContent : null
                 , cfop: item.querySelector('prod > CFOP').textContent
                 , un: item.querySelector('prod > uCom').textContent
                 , vunit: item.querySelector('prod > vUnCom').textContent * 1
                 , quant: item.querySelector('prod > qCom').textContent * 1
-                , vun: item.querySelector('prod > vUnCom').textContent * 1
                 , vseg: item.querySelector('prod > vSeg') ? item.querySelector('prod > vSeg').textContent * 1 : 0
                 , vfrete: item.querySelector('prod > vFrete') ? item.querySelector('prod > vFrete').textContent * 1 : 0
                 , voutro: item.querySelector('prod > vOutro') ? item.querySelector('prod > vOutro').textContent * 1 : 0
@@ -29,6 +29,7 @@ const XmlToJson = (arquivo) => {
                 , pipi: item.querySelector('imposto > IPI pIPI') ? item.querySelector('imposto > IPI pIPI').textContent * 1 : 0
                 , vdesc: item.querySelector('prod vDesc') ? item.querySelector('prod vDesc').textContent * 1 : 0
                 , pmvast: item.querySelector('imposto > ICMS pMVAST') ? item.querySelector('imposto > ICMS pMVAST').textContent * 1 : null
+                , vprod: item.querySelector('prod > vProd').textContent * 1
             }
             return produto;
         })

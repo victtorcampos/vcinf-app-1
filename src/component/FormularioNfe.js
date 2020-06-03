@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import EntityNcm from './EntityNcm';
-import EntityCest from './EntityCest';
+// import EntityCest from './EntityCest';
 
 class FormularioNfe extends Component {
     constructor(props) {
@@ -11,73 +11,74 @@ class FormularioNfe extends Component {
 
         this.handleChangeCest = this.handleChangeCest.bind(this);
         this.handlerSomaValorTotalItens = this.handlerSomaValorTotalItens.bind(this);
+        this.buscaCest = this.buscaCest.bind(this);
+        this.handlerChangeCest = this.handlerChangeCest.bind(this);
     }
 
     componentDidMount() {
-        this.props.nfe.itens.map((item, index) => {
-            if(item.cest === ''){
-                let ncm_ = EntityNcm.filter((ncm_) => ncm_.codigo.includes(item.ncm))[0];
-                console.log(ncm_);
+
+        this.props.nfe.itens.map((item) => {
+            var ncmAtual = EntityNcm.filter((ncm) => ncm.codigo.includes(item.ncm))[0]
+            if (ncmAtual.tribSt) {
+                item.tribSt = true;
+                if (item.cest === null) {
+                    if (ncmAtual.cest.length === 1) {
+                        item.cest = ncmAtual.cest[0].codigo;
+                    }
+                } else {
+                    if (item.pmvast === null) {
+                        item.pmvast = ncmAtual.cest.filter((cest) => cest.codigo.includes(item.cest))[0].pmva;
+                    }
+                }
+                return item;
+            } else {
+                if (item.cest === null) {
+                    item.cest = "0000000"
+                    item.pmvast = 0.00
+                    return item;
+                }
+                return item;
             }
         });
+
+        console.log(this.props.nfe);
+
         this.setState({ nfe: this.props.nfe })
     }
 
-    handleChangeCest(event) {
-        var cestSelect = event.target.value;
-        var itemSelect = event.target.querySelector('option[value="' + cestSelect + '"]').getAttribute('item');
-
-        const itens = this.state.nfe.itens.map((item, i) => {
-            if (itemSelect === i.toString()) {
-                item.cest = cestSelect;
-            }
-            return item;
-        });
-        this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
+    buscaCest(ncm) {
+        var ncms = EntityNcm.filter((ncm_) => ncm_.codigo.includes(ncm));
+        if (ncms.length > 1) {
+            console.log(ncms);
+        }
     }
 
     handlerSomaValorTotalItens() {
         return (<b>{this.state.nfe.itens.reduce((acumulado, i) => acumulado + (i.vunit * i.quant), 0)}</b>);
     }
 
-    checkCest(key, ncm, cest) {
-        if (cest !== '') {
-            let cest_ = EntityCest.filter((cest_) => cest_.codigo.includes(cest))[0];
-            return (<><td>{cest_.codigo}</td><td>{cest_.pmva}</td></>)
-        } else {
-            let ncm_ = EntityNcm.filter((ncm_) => ncm_.codigo.includes(ncm))[0];
-            if (ncm_.tribSt) {
-                if (ncm_.cest.length > 0) {
-                    return (<><td colSpan={2}>
-                        <select value="0000000" onChange={this.handleChangeCest}>
-                            <option value="0000000"> - </option>
-                            {ncm_.cest.map((cest, index) =>
-                                <option key={cest.codigo} item={key} value={cest.codigo}>{cest.codigo} - {cest.pmva}</option>
-                            )}
-                        </select>
-                    </td></>)
-                }
-                return (<><td>{ncm_.cest.codigo}</td><td>{ncm_.cest.pmva}</td></>)
-            }
-            return (<><td>0000000</td><td>0.00</td></>)
-        }
+    handlerChangeCest(event) {
+        event.preventDefault();
+        console.log( event.target.value);
     }
 
-    handleClick(key, value) {
-        const itens = this.state.nfe.itens.map((item, i) => {
-            if (i === key) {
-                item.codigo = value
-                return item
-            } else {
-                return item;
-            }
-        });
-        this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
+    selectCest(props) {
+        return (<>
+            <td colSpan={2} className="text-center">
+                <select defaultValue={0} onChange={null} className="custom-select custom-select-sm">
+                    <option item={props.index} value="0">Celecionar Cest</option>
+                    <option item={props.index} value="1002000">Materiais de construção e congêneres</option>
+                    <option item={props.index} value="1301600">Medicamentos de uso humano e outros produtos farmacêuticos para uso humano ou veterinário​</option>
+                    <option item={props.index} value="1900600">Produtos eletrônicos, eletroeletrônicos e eletrodomésticos</option>
+                    <option item={props.index} value="2004000">Rações para animais domésticos</option>
+                    <option item={props.index} value="2803800">VENDAS PORTA A PORTA</option>
+                </select>
+            </td>
+        </>)
     }
 
     render() {
         if (this.state.nfe !== null) {
-            //console.log(this.state.nfe);
             return (
 
                 <div className="container-fluid" >
@@ -200,24 +201,27 @@ class FormularioNfe extends Component {
                                 <tbody>
                                     {this.state.nfe.itens.map(
                                         (produto, index) =>
-                                            <tr key={produto.item}>
+                                            <tr key={produto.item} className={produto.tribSt ? 'table-danger' : ''}>
                                                 <td className="text-center">{produto.item}</td>
                                                 <td className="text-center">{produto.codigo}</td>
                                                 <td>{produto.nome.toUpperCase()}</td>
                                                 <td>{produto.quant}</td>
-                                                <td>{produto.vun}</td>
+                                                <td>{produto.vunit}</td>
                                                 <td>{produto.vdesc}</td>
-                                                <td>{((produto.vun * produto.quant) - produto.vdesc) * 1}</td>
-                                                {/* <td className="text-center" onClick={() => this.handleClick(index,'9999')}>{produto.ncm}</td> */}
+                                                <td className="text-center">{produto.vprod}</td>
                                                 <td className="text-center">{produto.ncm}</td>
+                                                {produto.cest === null ?
+                                                    <this.selectCest ncm={produto.ncm} index={index} /> :
+                                                    <><td className="text-center">{produto.cest}</td>
+                                                        <td className="text-center">{produto.pmvast}</td></>
+                                                }
 
-                                                {/* {this.checkCest(index, produto.ncm, produto.cest)} */}
                                             </tr>
                                     )
                                     }
-                                    <tr>
+                                    <tr className="table-dark">
                                         <td colSpan={6}></td>
-                                        <td>{this.handlerSomaValorTotalItens()}</td>
+                                        <td className="text-center">{this.handlerSomaValorTotalItens()}</td>
                                         <td colSpan={3}></td>
                                     </tr>
                                 </tbody>
@@ -232,6 +236,19 @@ class FormularioNfe extends Component {
             return (<></>)
         }
 
+    }
+
+    handleChangeCest(event) {
+        var cestSelect = event.target.value;
+        var itemSelect = event.target.querySelector('option[value="' + cestSelect + '"]').getAttribute('item');
+
+        const itens = this.state.nfe.itens.map((item, i) => {
+            if (itemSelect === i.toString()) {
+                item.cest = cestSelect;
+            }
+            return item;
+        });
+        this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
     }
 }
 
