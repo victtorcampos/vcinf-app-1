@@ -9,7 +9,6 @@ class FormularioNfe extends Component {
             nfe: null
         }
 
-        this.handleChangeCest = this.handleChangeCest.bind(this);
         this.handlerSomaValorTotalItens = this.handlerSomaValorTotalItens.bind(this);
         this.handlerSomaValorIcmsStPago = this.handlerSomaValorIcmsStPago.bind(this);
         this.buscaCest = this.buscaCest.bind(this);
@@ -29,7 +28,8 @@ class FormularioNfe extends Component {
                 } else {
                     if (item.pmvast === null) {
                         item.pmvast = ncmAtual.cest.filter((cest) => cest.codigo.includes(item.cest))[0].pmva;
-                    }
+                        return item;
+                    }                     
                 }
                 return item;
             } else {
@@ -60,6 +60,20 @@ class FormularioNfe extends Component {
 
     handlerSomaValorIcmsStPago() {
         return (<b>{this.state.nfe.itens.reduce((a, i) => a + i.vicmsst, 0)}</b>);
+    }
+
+    calculaIcmsSt(props) {
+        var v = 0;
+        if (props.produto.tribSt) {
+            var p = props.produto;
+            
+            v = ((((p.vprod + p.vfrete + p.vseg + +p.voutro + p.vipi) - p.vdesc) * (1 + (p.pmvast / 100))) * (17 / 100)) - p.vicms;
+        }
+        console.log(props.produto.vicmsst2);
+        
+        return (<>
+            <td className="text-center">{fn(v)}</td>
+        </>);
     }
 
     selectCest(props) {
@@ -207,13 +221,13 @@ class FormularioNfe extends Component {
                                         <th scope="col">Valor Total</th>
                                         <th scope="col">Código NCM</th>
                                         <th scope="col">Código CEST</th>
-                                        <th scope="col">MVA%</th>
+                                        <th scope="col">ICMS ST</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {this.state.nfe.itens.map(
                                         (produto, index) =>
-                                            <tr key={produto.item} className={produto.tribSt ? 'table-danger' : ''}>
+                                            <tr key={produto.item} className={`${produto.tribSt ? 'table-danger' : ''}`}>
                                                 <td className="text-center">{produto.item}</td>
                                                 <td className="text-center">{produto.codigo}</td>
                                                 <td>{produto.nome.toUpperCase()}
@@ -221,14 +235,20 @@ class FormularioNfe extends Component {
                                                     {produto.vicms > 0 ? <><br /><span>ICMS : {produto.vicms}</span></> : ''}
                                                     {produto.vicmsst > 0 ? <><br /><span>ICMS ST : {produto.vicmsst}</span> </> : ''}
                                                 </td>
-                                                <td className="text-center" >{produto.quant}</td>
-                                                <td className="text-center">{produto.vunit}</td>
-                                                <td className="text-center">{produto.vdesc}</td>
-                                                <td className="text-center">{produto.vprod}</td>
+                                                <td className="text-center" >{fn(produto.quant)}</td>
+                                                <td className="text-center">{fn(produto.vunit)}</td>
+                                                <td className="text-center">{fn(produto.vdesc)}</td>
+                                                <td className="text-center">{fn(produto.vprod)}</td>
                                                 <td className="text-center">{produto.ncm}</td>
                                                 {produto.cest === null ?
                                                     <this.selectCest ncm={produto.ncm} index={index} /> :
-                                                    <><td className="text-center">{produto.cest}</td> <td className="text-center">{produto.pmvast}</td></>
+                                                    <><td className="text-center">{produto.cest}</td>
+                                                        <td className="text-center">{fn(produto.pmvast)}</td>
+                                                        {produto.vicmsst2 === null ?
+                                                            <this.calculaIcmsSt produto={produto} /> :
+                                                            <td className="text-center">{fn(produto.vicmsst2 * 1)}</td>
+                                                        }
+                                                    </>
                                                 }
 
                                             </tr>
@@ -253,19 +273,10 @@ class FormularioNfe extends Component {
         }
 
     }
+}
 
-    handleChangeCest(event) {
-        var cestSelect = event.target.value;
-        var itemSelect = event.target.querySelector('option[value="' + cestSelect + '"]').getAttribute('item');
-
-        const itens = this.state.nfe.itens.map((item, i) => {
-            if (itemSelect === i.toString()) {
-                item.cest = cestSelect;
-            }
-            return item;
-        });
-        this.setState(prevState => ({ nfe: { ...prevState.nfe, itens: itens } }))
-    }
+const fn = (numero) => {
+    return new Intl.NumberFormat("de-DE").format(numero);
 }
 
 export default FormularioNfe;
