@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import XmlToJson from './util/XmlToJson';
 import FormularioNfe from './component/FormularioNfe';
-//import EntityNcm from './component/EntityNcm';
 
 class App extends Component {
   constructor(props) {
@@ -49,6 +48,7 @@ class App extends Component {
             </button>
           </form>}
       </div>
+
     );
   }
 }
